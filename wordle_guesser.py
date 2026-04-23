@@ -7,7 +7,7 @@ round = 0
 
 def guess():
     best_score, best_word = 0, ""
-    for guess in guesses:
+    for guess in solutions:
         score = 0
         for solution in solutions:
             green, yellow = 0,0
