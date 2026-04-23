@@ -25,7 +25,7 @@ def guess_input(guess, secret_answer):
     
     return "".join(feedback)
 
-def main():
+def run_simulation():
     secret_answer = random.choice(list(solutions))
     print("secret answer is ", secret_answer)
     solver.reset_solutions()
@@ -39,11 +39,32 @@ def main():
 
         if guess == secret_answer:
             print("solver solved in ", round+1, "attempts")
-            break
+            return round+1
 
         solver.filter(feedback, guess)
     else:
         print("solver failed")
+        return 7
+
+def main():
+    results = [0]*7
+    simulation_count = 100
+    expected_value = 0
+
+    for _ in range(simulation_count):
+        attempts = run_simulation()
+        results[attempts-1] += 1
+    
+    for i in range(7):
+        fraction = results[i]/simulation_count
+        expected_value += fraction*(i+1)
+        print("Attempt count", i+1, ": ", fraction*100, "%")
+    print("Expected Attempts: ", expected_value)
+
+    
+    print("results: ", results)
+
+
 
 main()
 
