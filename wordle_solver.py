@@ -3,7 +3,6 @@ import re
 
 guesses = set(re.findall(r'"([^"]+)"', open("guesses.txt").read()))
 solutions = set(re.findall(r'"([^"]+)"', open("solutions.txt").read()))
-round = 0
 
 def guess():
     best_score, best_word = 0, ""
@@ -67,15 +66,21 @@ def filter(feedback, guess):
         if not valid:
             solutions.remove(solution)
 
-feedback = ""
-while feedback != "22222" and round < 6:
-    if round == 0:
-        word = "crane"
-    else:
-        word = guess()
-    print(word)
-    #guesses.remove(word)
-    feedback = input("feedback?")
-    filter(feedback,word)
-    print(solutions)
-    round += 1
+def reset_solutions():
+    global solutions
+    solutions = set(re.findall(r'"([^"]+)"', open("solutions.txt").read()))
+
+if __name__ == "__main__":
+    round = 0
+    feedback = ""
+    while feedback != "22222" and round < 6:
+        if round == 0:
+            word = "crane"
+        else:
+            word = guess()
+        print(word)
+        #guesses.remove(word)
+        feedback = input("feedback?")
+        filter(feedback,word)
+        print(solutions)
+        round += 1
