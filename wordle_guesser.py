@@ -19,8 +19,6 @@ def guess():
                     if guess[i] == solution[j]:
                         yellow += 1
             score += green + yellow/4
-            if guess in solutions:
-                score += 10000
         if score > best_score:
             best_score = score
             best_word = guess
@@ -72,15 +70,12 @@ def filter(feedback, guess):
 feedback = ""
 while feedback != "22222" and round < 6:
     if round == 0:
-        word = "saree"
+        word = "crane"
     else:
         word = guess()
     print(word)
-    guesses.remove(word)
+    #guesses.remove(word)
     feedback = input("feedback?")
-    user_word_input = input("word used? empty for provided guess")
-    if user_word_input:
-        word = user_word_input
     filter(feedback,word)
     print(solutions)
     round += 1
