@@ -88,10 +88,7 @@ if __name__ == "__main__":
     feedback = ""
     reset_solutions()
     while feedback != "22222" and round < 6:
-        if round == 0:
-            word = "crane"
-        else:
-            word = guess()
+        word = guess()
         print(f"Guess {round+1}: {word}")
         feedback = input("Enter feedback (e.g., 22220): ")
         filter(feedback, word)
