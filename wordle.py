@@ -1,6 +1,6 @@
 import re
 import random
-import wordle_solver_entropy as solver
+import wordle_solver_frequency as solver
 from collections import Counter
 
 guesses = set(re.findall(r'"([^"]+)"', open("guesses.txt").read()))

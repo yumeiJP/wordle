@@ -2,9 +2,11 @@ import re
 import random
 import json
 import os
-import wordle_solver_entropy as solver
+import argparse
+import importlib
 from collections import Counter
 
+# Load word lists (used by guess_input)
 guesses = set(re.findall(r'"([^"]+)"', open("guesses.txt").read()))
 solutions = set(re.findall(r'"([^"]+)"', open("solutions.txt").read()))
 
@@ -26,13 +28,13 @@ def guess_input(guess, secret_answer):
     
     return "".join(feedback)
 
-def run_simulation():
+def run_simulation(solver_module):
     secret_answer = random.choice(list(solutions))
     print("secret answer is ", secret_answer)
-    solver.reset_solutions()
+    solver_module.reset_solutions()
 
     for round in range(6):
-        guess = solver.guess()
+        guess = solver_module.guess()
         print("solver guesses: ", guess)
 
         feedback = guess_input(guess, secret_answer)
@@ -42,32 +44,47 @@ def run_simulation():
             print("solver solved in ", round+1, "attempts")
             return round+1
 
-        solver.filter(feedback, guess)
+        solver_module.filter(feedback, guess)
     else:
         print("solver failed")
         return 7
 
-def load_performance(filename="performance.json"):
+def load_performance(filename):
     if os.path.exists(filename):
         with open(filename, "r") as f:
             return json.load(f)
     return []
 
-def save_performance(attempts_list, filename="performance.json"):
+def save_performance(attempts_list, filename):
     with open(filename, "w") as f:
         json.dump(attempts_list, f)
 
 def main():
-    all_attempts = load_performance()
-    simulation_count = 10
+    parser = argparse.ArgumentParser(description="Simulate Wordle solver performance")
+    parser.add_argument("solver", nargs="?", default="wordle_solver_entropy",
+                        help="Name of the solver module (e.g., wordle_solver_entropy, wordle_solver)")
+    parser.add_argument("--simulations", "-n", type=int, default=10,
+                        help="Number of simulations to run (default: 100)")
+    args = parser.parse_args()
+
+    # Import the requested solver module
+    try:
+        solver_module = importlib.import_module(args.solver)
+    except ImportError:
+        print(f"Error: Could not import module '{args.solver}'")
+        return
+
+    # Use a separate JSON file for each solver
+    perf_filename = f"performance_{args.solver}.json"
+    all_attempts = load_performance(perf_filename)
     new_attempts = []
     
-    for _ in range(simulation_count):
-        attempts = run_simulation()
+    for _ in range(args.simulations):
+        attempts = run_simulation(solver_module)
         new_attempts.append(attempts)
         all_attempts.append(attempts)
     
-    save_performance(all_attempts)
+    save_performance(all_attempts, perf_filename)
     
     total = len(all_attempts)
     results = [0]*7
