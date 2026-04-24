@@ -82,3 +82,22 @@ def reset_solutions():
     global solutions, _first_guess_done
     solutions = set(re.findall(r'"([^"]+)"', open("solutions.txt").read()))
     _first_guess_done = False
+
+if __name__ == "__main__":
+    round = 0
+    feedback = ""
+    reset_solutions()
+    while feedback != "22222" and round < 6:
+        if round == 0:
+            word = "crane"
+        else:
+            word = guess()
+        print(f"Guess {round+1}: {word}")
+        feedback = input("Enter feedback (e.g., 22220): ")
+        filter(feedback, word)
+        print(f"Remaining solutions: {len(solutions)}")
+        round += 1
+    if feedback == "22222":
+        print("Solved!")
+    else:
+        print("Out of guesses")
