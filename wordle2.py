@@ -1,5 +1,7 @@
 import re
 import random
+import json
+import os
 import wordle_solver_entropy as solver
 from collections import Counter
 
@@ -10,7 +12,6 @@ def guess_input(guess, secret_answer):
     feedback = ['0']*5
     secret_answer_frequencies = Counter(secret_answer)
 
-    #green
     for i in range(5):
         if guess[i] == secret_answer[i]:
             feedback[i] = "2"
@@ -19,7 +20,7 @@ def guess_input(guess, secret_answer):
     for i in range(5):
         if feedback[i] == "2":
             continue
-        if secret_answer_frequencies.get(guess[i],0) > 0:
+        if secret_answer_frequencies.get(guess[i], 0) > 0:
             feedback[i] = "1"
             secret_answer_frequencies[guess[i]] -= 1
     
@@ -46,26 +47,41 @@ def run_simulation():
         print("solver failed")
         return 7
 
-def main():
-    results = [0]*7
-    simulation_count = 100
-    expected_value = 0
+def load_performance(filename="performance.json"):
+    if os.path.exists(filename):
+        with open(filename, "r") as f:
+            return json.load(f)
+    return []
 
+def save_performance(attempts_list, filename="performance.json"):
+    with open(filename, "w") as f:
+        json.dump(attempts_list, f)
+
+def main():
+    all_attempts = load_performance()
+    simulation_count = 5
+    new_attempts = []
+    
     for _ in range(simulation_count):
         attempts = run_simulation()
-        results[attempts-1] += 1
+        new_attempts.append(attempts)
+        all_attempts.append(attempts)
+    
+    save_performance(all_attempts)
+    
+    total = len(all_attempts)
+    results = [0]*7
+    expected_value = 0
+    for att in all_attempts:
+        results[att-1] += 1
     
     for i in range(7):
-        fraction = results[i]/simulation_count
+        fraction = results[i]/total if total > 0 else 0
         expected_value += fraction*(i+1)
         print("Attempt count", i+1, ": ", fraction*100, "%")
     print("Expected Attempts: ", expected_value)
+    print("Total simulations run: ", total)
+    print("Results from this batch: ", new_attempts)
 
-    
-    print("results: ", results)
-
-
-
-main()
-
-
+if __name__ == "__main__":
+    main()
