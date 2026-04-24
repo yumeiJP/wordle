@@ -4,7 +4,14 @@ import re
 guesses = set(re.findall(r'"([^"]+)"', open("guesses.txt").read()))
 solutions = set(re.findall(r'"([^"]+)"', open("solutions.txt").read()))
 
+_first_guess_done = False
+
 def guess():
+    global _first_guess_done
+    if not _first_guess_done:
+        _first_guess_done = True
+        return "crane"
+    
     best_score, best_word = 0, ""
     for guess in solutions:
         score = 0
@@ -67,8 +74,9 @@ def filter(feedback, guess):
             solutions.remove(solution)
 
 def reset_solutions():
-    global solutions
+    global solutions, _first_guess_done
     solutions = set(re.findall(r'"([^"]+)"', open("solutions.txt").read()))
+    _first_guess_done = False
 
 if __name__ == "__main__":
     round = 0

@@ -48,7 +48,7 @@ def run_simulation():
 
 def main():
     results = [0]*7
-    simulation_count = 100
+    simulation_count = 500
     expected_value = 0
 
     for _ in range(simulation_count):
